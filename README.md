@@ -4,6 +4,10 @@ True Home AI Agent: the AI operating system for Thai households
 
 This project is a Thai/English multimodal household agent that connects True mobile, True Fiber, TrueID, smart home devices, billing, service status, family usage, and support workflows. Instead of sending users through multiple apps and call centers, the agent should understand the household context and take action across services.
 
+## Problem Statement
+
+...
+
 Example requests:
 
 "Why is the internet slow in my bedroom?"
