@@ -2,7 +2,9 @@ True Home AI Agent: The AI Operating System for Thai Households
 Concept:
 
 Nowadays the subscription in the family is having a lot.
-So it's quite hard to track down for each member and also we have the TrueMoney Wallet. 
+So it's quite hard to track down for each member and also we have the TrueMoney Wallet that can paid for each subscriptions. and also we can have the True ecosystem integrated in it. For example, the True mobile because family members also need to paid for the WiFi and finding the new package that match their requirements for each year or month and also the True Fiber and True ID on the Netflix or something
+
+Solutions :
 
 A Thai/English multimodal household agent that connects True mobile, fiber, TrueID, smart home devices, billing, service status, family usage, and support workflows. Instead of users navigating apps and call centers, they ask:
 
@@ -14,5 +16,3 @@ A Thai/English multimodal household agent that connects True mobile, fiber, True
 
 Why this can be truly great:
 Most telco AI assistants only answer FAQs. This would act across the household: diagnose router/device/network issues, recommend packages, control smart devices, explain bills, create parental rules, and escalate only when needed. It matches True’s public strategy to “win the whole family” and bundle mobile, broadband, content, and smart home services.
-
-
