@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: truehome-postgres
+    environment:
+      POSTGRES_USER: truehome
+      POSTGRES_PASSWORD: truehome
+      POSTGRES_DB: truehome
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  chroma:
+    image: chromadb/chroma:0.5.5
+    container_name: truehome-chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma
+
+volumes:
+  postgres_data:
+  chroma_data:
