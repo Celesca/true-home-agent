@@ -1,28 +1,50 @@
 True Home AI Agent: the AI operating system for Thai households
 
-## Product Idea
+## Overview
 
 This project is a Thai/English multimodal household agent that connects True mobile, True Fiber, TrueID, smart home devices, billing, service status, family usage, and support workflows. Instead of sending users through multiple apps and call centers, the agent should understand the household context and take action across services.
 
 Example requests:
 
-“Why is the internet slow in my bedroom?”
-“Pause YouTube on my child’s tablet after 9 PM.”
-“Find a cheaper family plan without losing Netflix and TrueID sports.”
-“My bill increased. Explain why.”
-“Turn off unused devices and save electricity.”
+"Why is the internet slow in my bedroom?"
+"Pause YouTube on my child's tablet after 9 PM."
+"Find a cheaper family plan without losing Netflix and TrueID sports."
+"My bill increased. Explain why."
+"Turn off unused devices and save electricity."
+
+## MVP Architecture
+
+```mermaid
+graph TD
+	User -->|chat| API[FastAPI Backend]
+	API --> Graph[LangGraph ReAct Agent]
+	Graph --> Tools[Tool Layer]
+	Tools --> Postgres[(Postgres)]
+	Tools --> Chroma[(ChromaDB)]
+	Graph --> LLM[LLM Provider]
+	LLM --> Langfuse[Langfuse Tracing]
+```
+
+## Repo Structure
+
+- backend/src: FastAPI app, LangGraph agent, tools, and RAG adapters
+- backend/config: prompts and settings
+- backend/tests: basic backend tests
+- backend/requirements.txt: backend dependencies
+- docker-compose.yml: Postgres + ChromaDB
+- README.md: product, architecture, and run instructions
 
 ## Refined System Prompt Draft
 
-Use the following as the base system prompt for the agent. The backend will compose this prompt with tool-specific markdown blocks based on intent.
+Use the following as the base system prompt for the agent. The backend composes this prompt with tool-specific markdown blocks based on intent.
 
 ```markdown
 You are True Home AI Agent, a bilingual Thai-English household assistant for True customers.
 
-Your job is to understand the user’s household goal, identify the correct intent, and either answer directly or use the available tools in the safest and most helpful way.
+Your job is to understand the user's household goal, identify the correct intent, and either answer directly or use the available tools in the safest and most helpful way.
 
 Operating rules:
-- Always respond in the user’s preferred language when possible, and switch smoothly between Thai and English when helpful.
+- Always respond in the user's preferred language when possible, and switch smoothly between Thai and English when helpful.
 - Prefer action-oriented answers: diagnose, explain, compare, recommend, or prepare a support step.
 - If a tool is needed, choose the smallest tool set that solves the request.
 - If the request is ambiguous, ask one focused clarifying question.
@@ -58,10 +80,10 @@ The backend uses markdown blocks like these to build the system prompt dynamical
 Use this pack when the user asks about balance, bills, payments, spending, or wallet-linked subscriptions.
 
 Available tools:
-- `check_balance`: inspect wallet balance.
-- `get_transactions`: review recent spending and recurring charges.
-- `get_pending_bills`: inspect bills due this month.
-- `pay`: submit a payment to a biller or merchant.
+- check_balance: inspect wallet balance.
+- get_transactions: review recent spending and recurring charges.
+- get_pending_bills: inspect bills due this month.
+- pay: submit a payment to a biller or merchant.
 
 Response style:
 - Show the amount, the target, and the consequence of the action.
@@ -76,13 +98,13 @@ Response style:
 Use this pack when the user asks about TrueID subscriptions, sports, streaming access, login issues, content entitlement, or package compatibility.
 
 Available tools:
-- `get_trueid_subscription`: inspect the current TrueID plan.
-- `check_content_entitlement`: verify whether a channel, movie, or sports package is included.
-- `recommend_trueid_plan`: compare cheaper or better-fitting packages.
+- get_trueid_subscription: inspect the current TrueID plan.
+- check_content_entitlement: verify whether a channel, movie, or sports package is included.
+- recommend_trueid_plan: compare cheaper or better-fitting packages.
 
 Response style:
 - Explain whether the request is a subscription issue, entitlement issue, or login issue.
-- Recommend only plans that preserve the user’s stated must-have content.
+- Recommend only plans that preserve the user's stated must-have content.
 ```
 
 ### True Fiber
@@ -93,9 +115,9 @@ Response style:
 Use this pack when the user asks about slow internet, router trouble, outages, mesh Wi-Fi, or home-network diagnostics.
 
 Available tools:
-- `check_network_status`: inspect service health and outages.
-- `diagnose_wifi_issue`: compare router, signal, and device symptoms.
-- `recommend_mesh_upgrade`: suggest a home coverage upgrade when needed.
+- check_network_status: inspect service health and outages.
+- diagnose_wifi_issue: compare router, signal, and device symptoms.
+- recommend_mesh_upgrade: suggest a home coverage upgrade when needed.
 
 Response style:
 - Explain whether the likely root cause is service-side, router-side, or device-side.
@@ -110,22 +132,64 @@ Response style:
 Use this pack when the user asks to pause devices, automate schedules, save electricity, or manage household device access.
 
 Available tools:
-- `list_devices`: inspect devices currently connected to the household.
-- `pause_device`: temporarily pause a device on the network.
-- `create_schedule`: set a repeating automation rule.
+- list_devices: inspect devices currently connected to the household.
+- pause_device: temporarily pause a device on the network.
+- create_schedule: set a repeating automation rule.
 
 Response style:
 - Confirm the target device and the timing before making a change.
 - If the action affects a child device or family rule, describe the policy clearly.
 ```
 
-## Backend Scope
+## Backend MVP (FastAPI + LangGraph ReAct)
 
-The current backend implementation is a mocked FastAPI service that simulates a LangGraph-style flow:
+The backend is a FastAPI service that runs a LangGraph ReAct agent. It detects intent, injects tool markdown into the system prompt, and uses tools for wallet, TrueID, True Fiber, smart home, and RAG search.
 
-1. classify the intent,
-2. build the system prompt from the relevant tool markdown,
-3. execute the selected mock tools,
-4. return the graph trace and the final drafted answer.
+Core endpoints:
 
-This is intentionally lightweight so the backend contract is clear before the real integrations are added.
+- /health
+- /tools
+- /agent/preview
+- /agent/run
+- /rag/upsert
+
+## Local Backend Run (no venv)
+
+From the backend folder:
+
+```bash
+python -m uvicorn src.app:app --reload
+```
+
+Required environment variables for LLM:
+
+- OPENAI_API_KEY
+- OPENAI_MODEL (default: gpt-4o-mini)
+
+Optional environment variables:
+
+- CHROMA_HOST (default: localhost)
+- CHROMA_PORT (default: 8000)
+- CHROMA_COLLECTION (default: true-home-kb)
+- LANGFUSE_PUBLIC_KEY
+- LANGFUSE_SECRET_KEY
+- LANGFUSE_HOST (default: http://localhost:3000)
+
+## Docker Compose (Postgres + ChromaDB)
+
+Start the data services from the repo root:
+
+```bash
+docker compose up -d postgres chroma
+```
+
+## Langfuse (optional tracing)
+
+If you have a VM, you can self-host Langfuse there and point the backend to it using LANGFUSE_HOST.
+
+Suggested VM steps:
+
+1. Install Docker and Docker Compose on the VM.
+2. Download the official Langfuse docker compose file from the Langfuse docs.
+3. Start the stack and expose ports 3000 and 4000 to your backend.
+4. Set LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, and LANGFUSE_HOST on the backend.
