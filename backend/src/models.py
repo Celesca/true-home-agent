@@ -22,8 +22,6 @@ class AgentTraceStep(BaseModel):
 
 class ChatResponse(BaseModel):
     intent: str
-    system_prompt: str
-    tool_markdown: list[str]
     tool_calls: list[ToolCall]
     trace: list[AgentTraceStep]
     answer: str

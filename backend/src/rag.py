@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import chromadb
@@ -7,6 +8,7 @@ import chromadb
 from config.settings import get_settings
 
 _collection = None
+logger = logging.getLogger(__name__)
 
 
 def _get_collection():
@@ -20,6 +22,7 @@ def _get_collection():
         _collection = client.get_or_create_collection(name=settings.chroma_collection)
         return _collection
     except Exception:
+        logger.exception("Unable to initialize ChromaDB collection")
         return None
 
 

@@ -49,6 +49,9 @@ def check_balance() -> dict[str, Any]:
 @tool("pay")
 def pay(to: str, amount: float) -> dict[str, Any]:
     """Pay a biller or merchant and return the payment result."""
+    if not to.strip() or amount <= 0:
+        return {"status": "failed", "reason": "invalid_payment_request"}
+
     balance = DB["wallet"]["balance_thb"]
     if amount > balance:
         return {"status": "failed", "reason": "insufficient_funds", "balance_thb": balance}
