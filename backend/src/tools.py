@@ -42,11 +42,13 @@ DB = {
 
 @tool("check_balance")
 def check_balance() -> dict[str, Any]:
+    """Return current wallet balance and user name."""
     return {"balance_thb": DB["wallet"]["balance_thb"], "user": DB["wallet"]["user"]}
 
 
 @tool("pay")
 def pay(to: str, amount: float) -> dict[str, Any]:
+    """Pay a biller or merchant and return the payment result."""
     balance = DB["wallet"]["balance_thb"]
     if amount > balance:
         return {"status": "failed", "reason": "insufficient_funds", "balance_thb": balance}
@@ -59,21 +61,25 @@ def pay(to: str, amount: float) -> dict[str, Any]:
 
 @tool("get_transactions")
 def get_transactions(limit: int = 5) -> dict[str, Any]:
+    """Return recent wallet transactions."""
     return {"transactions": DB["transactions"][-limit:]}
 
 
 @tool("get_pending_bills")
 def get_pending_bills() -> dict[str, Any]:
+    """Return unpaid bills due this month."""
     return {"pending_bills": DB["billers"]}
 
 
 @tool("get_trueid_subscription")
 def get_trueid_subscription() -> dict[str, Any]:
+    """Return the current TrueID subscription details."""
     return DB["trueid"]
 
 
 @tool("check_content_entitlement")
 def check_content_entitlement(content: str) -> dict[str, Any]:
+    """Check whether the requested content is included in the current plan."""
     title = content.lower()
     if "sports" in title:
         return {"content": content, "included": DB["trueid"]["sports"]}
@@ -84,6 +90,7 @@ def check_content_entitlement(content: str) -> dict[str, Any]:
 
 @tool("recommend_trueid_plan")
 def recommend_trueid_plan(preference: str) -> dict[str, Any]:
+    """Recommend a TrueID plan based on user preference."""
     if "cheap" in preference.lower():
         return {"recommended_plan": "TrueID Basic", "reason": "lowest cost while preserving core streaming access"}
     return {"recommended_plan": DB["trueid"]["plan"], "reason": "preserves sports and bundled streaming"}
@@ -91,11 +98,13 @@ def recommend_trueid_plan(preference: str) -> dict[str, Any]:
 
 @tool("check_network_status")
 def check_network_status() -> dict[str, Any]:
+    """Return the current fiber network status."""
     return DB["fiber"]
 
 
 @tool("diagnose_wifi_issue")
 def diagnose_wifi_issue(room: str) -> dict[str, Any]:
+    """Diagnose Wi-Fi issues for a room and return a likely cause."""
     return {
         "room": room,
         "likely_cause": "coverage_or_interference",
@@ -106,16 +115,19 @@ def diagnose_wifi_issue(room: str) -> dict[str, Any]:
 
 @tool("recommend_mesh_upgrade")
 def recommend_mesh_upgrade() -> dict[str, Any]:
+    """Recommend a mesh upgrade when coverage is inconsistent."""
     return {"recommended": True, "reason": "consistent coverage across bedrooms and child devices"}
 
 
 @tool("list_devices")
 def list_devices() -> dict[str, Any]:
+    """List household devices connected to the network."""
     return {"devices": DB["devices"]}
 
 
 @tool("pause_device")
 def pause_device(device_name: str) -> dict[str, Any]:
+    """Pause a device by name."""
     for device in DB["devices"]:
         if device["name"].lower() == device_name.lower():
             device["status"] = "paused"
@@ -125,11 +137,13 @@ def pause_device(device_name: str) -> dict[str, Any]:
 
 @tool("create_schedule")
 def create_schedule(device_name: str, action: str, time: str) -> dict[str, Any]:
+    """Create a simple device schedule rule."""
     return {"status": "scheduled", "device_name": device_name, "action": action, "time": time}
 
 
 @tool("search_knowledge_base")
 def search_knowledge_base(query: str, limit: int = 4) -> dict[str, Any]:
+    """Search the household knowledge base via ChromaDB."""
     return query_knowledge_base(query=query, limit=limit)
 
 
