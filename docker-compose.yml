@@ -10,6 +10,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
+      # keep direct expansion optional — we also mount backend/.env into the container
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
       CHROMA_HOST: ${CHROMA_HOST:-chroma}
@@ -20,6 +21,8 @@ services:
       LANGFUSE_HOST: ${LANGFUSE_HOST:-http://localhost:3000}
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend/.env:/app/.env:ro
 
   frontend:
     build:
