@@ -6,13 +6,26 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langgraph.prebuilt import create_react_agent
 from langchain_openai import ChatOpenAI
 
-from config.prompts import BASE_SYSTEM_PROMPT, TOOL_MARKDOWN
+from config.prompts import BASE_SYSTEM_PROMPT, SKILL_MARKDOWN, TOOL_MARKDOWN
 from config.settings import get_settings
 from src.models import ChatRequest, ToolCall
 from src.tools import ALL_TOOLS, TOOLS_BY_INTENT
 
 
 INTENT_KEYWORDS = {
+    "subscription": [
+        "subscription",
+        "subscriptions",
+        "plan",
+        "package",
+        "bundle",
+        "แพ็ก",
+        "แพ็กเกจ",
+        "แพคเกจ",
+        "สมัคร",
+        "สมาชิก",
+        "แพ็กเกจรายเดือน",
+    ],
     "trueid": ["trueid", "netflix", "sports", "movie", "stream"],
     "fiber": ["wifi", "fiber", "internet", "slow", "router", "latency"],
     "smart_home": ["pause", "device", "schedule", "electricity", "smart home"],
@@ -29,14 +42,23 @@ def classify_intent(message: str) -> str:
 
 
 def build_system_prompt(intent: str) -> tuple[str, list[str]]:
+    skill_markdown = []
     tool_markdown = []
+    skill_block = SKILL_MARKDOWN.get(intent)
+    if skill_block:
+        skill_markdown.append(skill_block)
     if intent in TOOL_MARKDOWN:
         tool_markdown.append(TOOL_MARKDOWN[intent])
     if intent == "rag":
         tool_markdown.append(TOOL_MARKDOWN["rag"])
     system_prompt = BASE_SYSTEM_PROMPT
+    blocks = []
+    if skill_markdown:
+        blocks.extend(skill_markdown)
     if tool_markdown:
-        system_prompt = f"{BASE_SYSTEM_PROMPT}\n\n" + "\n\n".join(tool_markdown)
+        blocks.extend(tool_markdown)
+    if blocks:
+        system_prompt = f"{BASE_SYSTEM_PROMPT}\n\n" + "\n\n".join(blocks)
     return system_prompt, tool_markdown
 
 

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 BASE_SYSTEM_PROMPT = """You are True Home AI Agent, a bilingual Thai-English household assistant for True customers.
 
 Your job is to understand the user's household goal, identify the correct intent, and either answer directly or use the available tools in the safest and most helpful way.
@@ -25,6 +27,22 @@ When giving a final answer:
 +- Be concise.
 +- Use bullets only when they improve readability.
 +- End with a clear next action when possible."""
+
+SKILLS_DIR = Path(__file__).resolve().parent / "skills"
+
+
+def _load_skill_markdown(name: str) -> str | None:
+    path = SKILLS_DIR / f"{name}.md"
+    if not path.exists():
+        return None
+    content = path.read_text(encoding="utf-8").strip()
+    return content or None
+
+
+SKILL_MARKDOWN = {
+    "subscription": _load_skill_markdown("subscription"),
+}
+
 
 TOOL_MARKDOWN = {
     "wallet": """## Tool Pack: TrueMoney Wallet
@@ -76,6 +94,16 @@ Available tools:
 Response style:
 +- Confirm the target device and the timing before making a change.
 +- If the action affects a child device or family rule, describe the policy clearly.""",
+    "subscription": """## Tool Pack: Family Subscriptions
+
+Use this pack when the user asks to view, summarize, or compare family subscriptions, bundles, or packages.
+
+Available tools:
+- list_family_subscriptions: list all active subscriptions for the household.
+
+Response style:
+- Keep the summary short and action-oriented.
+- If the user asks to change a plan, confirm the target service first.""",
     "rag": """## Tool Pack: Household Knowledge Base
 
 Use this pack when the user asks for general help, policy details, troubleshooting steps, or package comparisons.

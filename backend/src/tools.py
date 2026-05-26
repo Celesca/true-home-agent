@@ -26,6 +26,35 @@ DB = {
         "netflix_bundle": True,
         "price_thb": 249.00,
     },
+    "subscriptions": [
+        {
+            "service": "TrueID Plus Family",
+            "category": "Streaming",
+            "price_thb": 249.00,
+            "billing_cycle": "monthly",
+            "status": "active",
+            "owner": "Family",
+            "next_bill_date": "2026-06-01",
+        },
+        {
+            "service": "True Fiber 1Gbps",
+            "category": "Home Internet",
+            "price_thb": 899.00,
+            "billing_cycle": "monthly",
+            "status": "active",
+            "owner": "Home",
+            "next_bill_date": "2026-06-03",
+        },
+        {
+            "service": "True Move H 5G Family",
+            "category": "Mobile",
+            "price_thb": 1199.00,
+            "billing_cycle": "monthly",
+            "status": "active",
+            "owner": "Parents",
+            "next_bill_date": "2026-06-05",
+        },
+    ],
     "fiber": {
         "status": "degraded",
         "latency_ms": 78,
@@ -75,6 +104,12 @@ def get_pending_bills() -> dict[str, Any]:
 def get_trueid_subscription() -> dict[str, Any]:
     """Return the current TrueID subscription details."""
     return DB["trueid"]
+
+
+@tool("list_family_subscriptions")
+def list_family_subscriptions() -> dict[str, Any]:
+    """Return all family subscription records."""
+    return {"subscriptions": DB["subscriptions"]}
 
 
 @tool("check_content_entitlement")
@@ -148,6 +183,7 @@ def search_knowledge_base(query: str, limit: int = 4) -> dict[str, Any]:
 
 
 TOOLS_BY_INTENT = {
+    "subscription": [list_family_subscriptions],
     "wallet": [check_balance, get_transactions, get_pending_bills, pay],
     "trueid": [get_trueid_subscription, check_content_entitlement, recommend_trueid_plan],
     "fiber": [check_network_status, diagnose_wifi_issue, recommend_mesh_upgrade],
@@ -157,6 +193,7 @@ TOOLS_BY_INTENT = {
 
 
 ALL_TOOLS = [
+    list_family_subscriptions,
     check_balance,
     get_transactions,
     get_pending_bills,
