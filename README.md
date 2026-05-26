@@ -197,3 +197,10 @@ Suggested VM steps:
 2. Download the official Langfuse docker compose file from the Langfuse docs.
 3. Start the stack and expose ports 3000 and 4000 to your backend.
 4. Set LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, and LANGFUSE_HOST on the backend.
+
+## Fix the docker-compose frontend doesn't appear
+
+docker compose build --no-cache frontend
+docker compose up -d frontend
+docker compose exec frontend sh -c "npm ci"
+docker compose restart frontend
