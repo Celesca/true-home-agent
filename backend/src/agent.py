@@ -82,6 +82,11 @@ def build_callbacks(household_id: str | None) -> list[Any]:
 
 def build_llm(callbacks: list[Any]) -> ChatOpenAI:
     settings = get_settings()
+    if not settings.openai_api_key:
+        raise RuntimeError(
+            "Missing OPENAI_API_KEY environment variable. Set OPENAI_API_KEY to continue."
+        )
+    # ChatOpenAI reads API key from environment; ensure it's present for clearer errors
     return ChatOpenAI(model=settings.openai_model, temperature=0.2, callbacks=callbacks)
 
 

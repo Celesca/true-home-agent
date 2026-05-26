@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.agent import preview_prompt, run_agent
 from src.models import ChatRequest, ChatResponse, RagUpsertRequest, RagUpsertResponse
@@ -12,6 +13,13 @@ from src.tools import ALL_TOOLS
 
 
 app = FastAPI(title="True Home AI Agent", version="0.2.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")

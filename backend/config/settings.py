@@ -2,6 +2,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import os
+from pathlib import Path
+
+# Optional: load a local .env file so the container can read backend/.env directly
+try:
+    from dotenv import load_dotenv
+except Exception:
+    load_dotenv = None
+
+_DOTENV_PATH = Path(__file__).resolve().parent.parent / ".env"
+if load_dotenv and _DOTENV_PATH.exists():
+    load_dotenv(dotenv_path=_DOTENV_PATH)
 
 
 @dataclass(frozen=True)

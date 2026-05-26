@@ -19,7 +19,7 @@ services:
       LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
       LANGFUSE_HOST: ${LANGFUSE_HOST:-http://localhost:3000}
     ports:
-      - "8001:8000"
+      - "8000:8000"
 
   frontend:
     build:
@@ -29,7 +29,7 @@ services:
     depends_on:
       - backend
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:8000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
     ports:
       - "3000:3000"
     volumes:
@@ -52,7 +52,7 @@ services:
     image: chromadb/chroma:0.5.5
     container_name: truehome-chroma
     ports:
-      - "8000:8000"
+      - "8002:8000"
     volumes:
       - chroma_data:/chroma
 
