@@ -116,8 +116,6 @@ def run_agent(request: ChatRequest) -> dict[str, Any]:
 
     return {
         "intent": intent,
-        "system_prompt": system_prompt,
-        "tool_markdown": tool_markdown,
         "tool_calls": extract_tool_calls(final_messages),
         "trace": [
             {"node": "classify_intent", "detail": {"intent": intent}},

@@ -38,8 +38,6 @@ def agent_run(request: ChatRequest) -> ChatResponse:
 
     return ChatResponse(
         intent=state["intent"],
-        system_prompt=state["system_prompt"],
-        tool_markdown=state["tool_markdown"],
         tool_calls=state["tool_calls"],
         trace=state["trace"],
         answer=state["answer"],
