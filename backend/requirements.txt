@@ -10,3 +10,4 @@ python-dotenv>=1.0
 requests>=2.31.0
 beautifulsoup4>=4.12.2
 duckduckgo-search>=2.6.4
+crawl4ai>=0.8.6
