@@ -222,13 +222,20 @@ How to use the scraper locally (best-effort live promotions):
 pip install -r backend/requirements.txt
 ```
 
-2. Start the backend service:
+2. Install Crawl4AI browser dependencies (once per machine):
+
+```bash
+crawl4ai-setup
+python -m playwright install --with-deps chromium
+```
+
+3. Start the backend service:
 
 ```bash
 python -m uvicorn src.app:app --reload
 ```
 
-3. Call the scraper tool directly from a Python REPL or within the agent tools. Example quick test:
+4. Call the scraper tool directly from a Python REPL or within the agent tools. Example quick test:
 
 ```python
 from src.promotion_scraper import scrape_promotions
