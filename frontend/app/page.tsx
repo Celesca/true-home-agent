@@ -14,6 +14,12 @@ type AssistantResponse = {
   answer?: string;
 };
 
+type QuickAction = {
+  label: string;
+  prompt: string;
+  hint: string;
+};
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 const initialMessages: ChatMessage[] = [
@@ -22,6 +28,29 @@ const initialMessages: ChatMessage[] = [
     role: "assistant",
     content:
       "สวัสดีครับ ฉันช่วยดู Subscription, บิล, และบริการในบ้านของคุณได้\n\nลองพิมพ์: **ดู Subscription ทั้งหมดของครอบครัวชั้นหน่อย**",
+  },
+];
+
+const quickActions: QuickAction[] = [
+  {
+    label: "Family Subscriptions",
+    prompt: "Show my family subscription list with payment cycle, owner, name, and value.",
+    hint: "งวดของการชำระ + owner + name + value",
+  },
+  {
+    label: "True Mobile Promotion",
+    prompt: "Check the current promotion for my True Mobile package.",
+    hint: "promotion on current package",
+  },
+  {
+    label: "IoT Household Control",
+    prompt: "Please shut down the TV device in my household.",
+    hint: "device pause / shutdown",
+  },
+  {
+    label: "TrueWiFi Router",
+    prompt: "Adjust my TrueWiFi router speed and diagnose the router status.",
+    hint: "speed profile + diagnostics",
   },
 ];
 
@@ -169,6 +198,29 @@ export default function Home() {
                 Markdown enabled
               </div>
             </div>
+          </div>
+
+          <div className="grid gap-3 border-b border-white/70 bg-white/50 px-4 py-4 sm:grid-cols-2 xl:grid-cols-4 sm:px-6">
+            {quickActions.map((action) => (
+              <button
+                key={action.label}
+                type="button"
+                onClick={() => {
+                  void sendMessage(action.prompt);
+                }}
+                className="group rounded-[22px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,246,238,0.9))] p-4 text-left shadow-[0_10px_24px_rgba(30,17,8,0.06)] transition hover:-translate-y-0.5 hover:border-[#ff6a00]/18 hover:shadow-[0_16px_28px_rgba(30,17,8,0.08)]"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b06b36]">
+                  Skill
+                </p>
+                <h2 className="mt-1 font-display text-base text-[#26170d]">
+                  {action.label}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-[#6f4c31]">
+                  {action.hint}
+                </p>
+              </button>
+            ))}
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
