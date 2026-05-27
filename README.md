@@ -204,3 +204,41 @@ docker compose build --no-cache frontend
 docker compose up -d frontend
 docker compose exec frontend sh -c "npm ci"
 docker compose restart frontend
+
+## Skills & Usage
+
+This project exposes four primary skills that the agent can execute. Each skill is wired to a small set of backend tools and a skill markdown block under `backend/config/skills/`.
+
+- **Family Subscriptions** — shows a table of family subscriptions with `งวดของการชำระ`, `owner`, `name`, and `value`. Tool: `list_family_subscriptions`.
+- **True Mobile Promotion** — checks current mobile package promotions. Tools: `get_mobile_promotions` (cached mock) and `scrape_promotions` (live scrape).
+- **IoT Household Control** — list and pause household IoT devices. Tools: `list_devices`, `pause_device`, `create_schedule`.
+- **TrueWiFi Router** — diagnose router/wifi and adjust speed profiles. Tools: `check_network_status`, `diagnose_wifi_issue`, `adjust_router_speed`.
+
+How to use the scraper locally (best-effort live promotions):
+
+1. Install backend Python requirements (includes the scraper deps):
+
+```bash
+pip install -r backend/requirements.txt
+```
+
+2. Start the backend service:
+
+```bash
+python -m uvicorn src.app:app --reload
+```
+
+3. Call the scraper tool directly from a Python REPL or within the agent tools. Example quick test:
+
+```python
+from src.promotion_scraper import scrape_promotions
+print(scrape_promotions())
+```
+
+The agent also registers a tool named `scrape_promotions` so the `mobile_promotion` skill will attempt a live scrape when invoked by the agent.
+
+If the live scrape fails (missing deps or remote site structure changes), the agent falls back to the cached `mobile_promotions` mock in `backend/src/tools.py`.
+
+UI notes:
+- The frontend includes quick-action skill cards in the chat UI to trigger each skill.
+- Theme updated to a white + True red corporate palette (see `frontend/app/globals.css`).

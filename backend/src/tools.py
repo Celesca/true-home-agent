@@ -4,6 +4,7 @@ from typing import Any
 import random
 
 from langchain_core.tools import tool
+from src.promotion_scraper import scrape_promotions
 
 from src.rag import query_knowledge_base
 
@@ -129,6 +130,14 @@ def get_mobile_promotions() -> dict[str, Any]:
     return DB["mobile_promotions"]
 
 
+@tool("scrape_promotions")
+def scrape_promotions_tool(query: str | None = None) -> dict[str, Any]:
+    """Run the promotions scraper and return discovered items."""
+    q = query or "True promotion site:true.th/promotion"
+    result = scrape_promotions(q)
+    return result
+
+
 @tool("check_content_entitlement")
 def check_content_entitlement(content: str) -> dict[str, Any]:
     """Check whether the requested content is included in the current plan."""
@@ -208,7 +217,8 @@ def search_knowledge_base(query: str, limit: int = 4) -> dict[str, Any]:
 
 TOOLS_BY_INTENT = {
     "subscription": [list_family_subscriptions],
-    "mobile_promotion": [get_mobile_promotions],
+    # prefer live scrape in addition to cached DB
+    "mobile_promotion": [get_mobile_promotions, scrape_promotions_tool],
     "iot_household": [list_devices, pause_device, create_schedule],
     "wifi_router": [check_network_status, adjust_router_speed, diagnose_wifi_issue, recommend_mesh_upgrade],
     "wallet": [check_balance, get_transactions, get_pending_bills, pay],
@@ -236,5 +246,6 @@ ALL_TOOLS = [
     list_devices,
     pause_device,
     create_schedule,
+    scrape_promotions_tool,
     search_knowledge_base,
 ]
