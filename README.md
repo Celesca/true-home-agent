@@ -1,4 +1,7 @@
-True Home AI Agent: the AI operating system for Thai households
+# True Home AI Agent: the AI operating system for Thai households
+
+<img height="180" alt="true_logo" src="https://github.com/user-attachments/assets/1ccc414b-3c8b-41a1-b263-2095f59ead42" />
+
 
 ## Overview
 
