@@ -20,7 +20,10 @@ type QuickAction = {
   hint: string;
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Default to proxy path '/api' so the frontend can call the backend through
+// the same origin (nginx). If NEXT_PUBLIC_API_URL is provided at build/runtime
+// it will be used instead (useful for development or direct backend calls).
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 const initialMessages: ChatMessage[] = [
   {
