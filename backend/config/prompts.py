@@ -40,7 +40,10 @@ def _load_skill_markdown(name: str) -> str | None:
 
 
 SKILL_MARKDOWN = {
-    "subscription": _load_skill_markdown("subscription"),
+    "subscription": _load_skill_markdown("family_subscriptions"),
+    "mobile_promotion": _load_skill_markdown("true_mobile_promotion"),
+    "iot_household": _load_skill_markdown("iot_household"),
+    "wifi_router": _load_skill_markdown("wifi_router"),
 }
 
 
@@ -104,6 +107,40 @@ Available tools:
 Response style:
 - Keep the summary short and action-oriented.
 - If the user asks to change a plan, confirm the target service first.""",
+    "mobile_promotion": """## Tool Pack: True Mobile Promotions
+
+Use this pack when the user asks about current mobile package promotions, eligible upgrades, or plan comparisons.
+
+Available tools:
+- search_knowledge_base: find current promotion and package notes.
+
+Response style:
+- Summarize the current package first.
+- Highlight any promotion, discount window, or eligibility constraint.""",
+    "iot_household": """## Tool Pack: Household IoT Controls
+
+Use this pack when the user asks to switch off household devices like TV, tablet, speaker, or other smart devices.
+
+Available tools:
+- list_devices: inspect connected household devices.
+- pause_device: pause a specific device.
+- create_schedule: create a repeat pause or automation rule.
+
+Response style:
+- Confirm the exact device before taking action.
+- If the request is ambiguous, ask whether the user wants a one-time shutdown or a schedule.""",
+    "wifi_router": """## Tool Pack: TrueWiFi Router Support
+
+Use this pack when the user asks to adjust router speed, check Wi-Fi status, or diagnose a router issue.
+
+Available tools:
+- check_network_status: inspect service health and outage status.
+- diagnose_wifi_issue: compare signal, latency, and likely cause.
+- recommend_mesh_upgrade: suggest a coverage improvement.
+
+Response style:
+- Explain whether the issue is service-side, router-side, or coverage-side.
+- Recommend one immediate check and one next step.""",
     "rag": """## Tool Pack: Household Knowledge Base
 
 Use this pack when the user asks for general help, policy details, troubleshooting steps, or package comparisons.

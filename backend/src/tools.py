@@ -4,6 +4,7 @@ from typing import Any
 import random
 
 from langchain_core.tools import tool
+from src.promotion_scraper import scrape_promotions
 
 from src.rag import query_knowledge_base
 
@@ -28,38 +29,46 @@ DB = {
     },
     "subscriptions": [
         {
-            "service": "TrueID Plus Family",
-            "category": "Streaming",
-            "price_thb": 249.00,
+            "name": "TrueID Plus Family",
+            "value_thb": 249.00,
             "billing_cycle": "monthly",
             "status": "active",
             "owner": "Family",
             "next_bill_date": "2026-06-01",
+            "payment_cycle_thai": "รายเดือน",
         },
         {
-            "service": "True Fiber 1Gbps",
-            "category": "Home Internet",
-            "price_thb": 899.00,
+            "name": "True Fiber 1Gbps",
+            "value_thb": 899.00,
             "billing_cycle": "monthly",
             "status": "active",
             "owner": "Home",
             "next_bill_date": "2026-06-03",
+            "payment_cycle_thai": "รายเดือน",
         },
         {
-            "service": "True Move H 5G Family",
-            "category": "Mobile",
-            "price_thb": 1199.00,
+            "name": "True Move H 5G Family",
+            "value_thb": 1199.00,
             "billing_cycle": "monthly",
             "status": "active",
             "owner": "Parents",
             "next_bill_date": "2026-06-05",
+            "payment_cycle_thai": "รายเดือน",
         },
     ],
+    "mobile_promotions": {
+        "current_package": "True Move H 5G Family",
+        "promotion_name": "Family Upgrade Bonus",
+        "discount_thb": 120,
+        "eligibility": "existing family mobile customers",
+        "valid_until": "2026-06-30",
+    },
     "fiber": {
         "status": "degraded",
         "latency_ms": 78,
         "signal_strength": "medium",
         "last_outage": "2026-05-25 19:20",
+        "speed_profile": "1Gbps",
     },
     "devices": [
         {"name": "Bedroom TV", "status": "online", "group": "children"},
@@ -115,6 +124,20 @@ def list_family_subscriptions() -> dict[str, Any]:
     return {"subscriptions": DB["subscriptions"]}
 
 
+@tool("get_mobile_promotions")
+def get_mobile_promotions() -> dict[str, Any]:
+    """Return the current mobile package promotion details."""
+    return DB["mobile_promotions"]
+
+
+@tool("scrape_promotions")
+def scrape_promotions_tool(query: str | None = None) -> dict[str, Any]:
+    """Run the promotions scraper and return discovered items."""
+    q = query or "True promotion site:true.th/promotion"
+    result = scrape_promotions(q)
+    return result
+
+
 @tool("check_content_entitlement")
 def check_content_entitlement(content: str) -> dict[str, Any]:
     """Check whether the requested content is included in the current plan."""
@@ -138,6 +161,13 @@ def recommend_trueid_plan(preference: str) -> dict[str, Any]:
 def check_network_status() -> dict[str, Any]:
     """Return the current fiber network status."""
     return DB["fiber"]
+
+
+@tool("adjust_router_speed")
+def adjust_router_speed(speed_profile: str) -> dict[str, Any]:
+    """Adjust the router speed profile."""
+    DB["fiber"]["speed_profile"] = speed_profile
+    return {"status": "updated", "speed_profile": speed_profile}
 
 
 @tool("diagnose_wifi_issue")
@@ -187,9 +217,13 @@ def search_knowledge_base(query: str, limit: int = 4) -> dict[str, Any]:
 
 TOOLS_BY_INTENT = {
     "subscription": [list_family_subscriptions],
+    # prefer live scrape in addition to cached DB
+    "mobile_promotion": [get_mobile_promotions, scrape_promotions_tool],
+    "iot_household": [list_devices, pause_device, create_schedule],
+    "wifi_router": [check_network_status, adjust_router_speed, diagnose_wifi_issue, recommend_mesh_upgrade],
     "wallet": [check_balance, get_transactions, get_pending_bills, pay],
     "trueid": [get_trueid_subscription, check_content_entitlement, recommend_trueid_plan],
-    "fiber": [check_network_status, diagnose_wifi_issue, recommend_mesh_upgrade],
+    "fiber": [check_network_status, adjust_router_speed, diagnose_wifi_issue, recommend_mesh_upgrade],
     "smart_home": [list_devices, pause_device, create_schedule],
     "rag": [search_knowledge_base],
 }
@@ -197,6 +231,7 @@ TOOLS_BY_INTENT = {
 
 ALL_TOOLS = [
     list_family_subscriptions,
+    get_mobile_promotions,
     check_balance,
     get_transactions,
     get_pending_bills,
@@ -205,10 +240,12 @@ ALL_TOOLS = [
     check_content_entitlement,
     recommend_trueid_plan,
     check_network_status,
+    adjust_router_speed,
     diagnose_wifi_issue,
     recommend_mesh_upgrade,
     list_devices,
     pause_device,
     create_schedule,
+    scrape_promotions_tool,
     search_knowledge_base,
 ]

@@ -26,9 +26,21 @@ INTENT_KEYWORDS = {
         "สมาชิก",
         "แพ็กเกจรายเดือน",
     ],
+    "mobile_promotion": [
+        "promotion",
+        "promo",
+        "discount",
+        "upgrade",
+        "offer",
+        "มือถือ",
+        "โปร",
+        "แพ็กมือถือ",
+        "true mobile",
+        "true move",
+    ],
+    "iot_household": ["pause", "device", "schedule", "electricity", "smart home", "shutdown", "turn off", "tv", "iot"],
+    "wifi_router": ["wifi", "fiber", "internet", "slow", "router", "latency", "speed", "diagnostic", "diagnostics", "status"],
     "trueid": ["trueid", "netflix", "sports", "movie", "stream"],
-    "fiber": ["wifi", "fiber", "internet", "slow", "router", "latency"],
-    "smart_home": ["pause", "device", "schedule", "electricity", "smart home"],
     "wallet": ["bill", "pay", "wallet", "balance", "transaction"],
 }
 
@@ -42,24 +54,18 @@ def classify_intent(message: str) -> str:
 
 
 def build_system_prompt(intent: str) -> tuple[str, list[str]]:
-    skill_markdown = []
-    tool_markdown = []
     skill_block = SKILL_MARKDOWN.get(intent)
-    if skill_block:
-        skill_markdown.append(skill_block)
-    if intent in TOOL_MARKDOWN:
-        tool_markdown.append(TOOL_MARKDOWN[intent])
-    if intent == "rag":
-        tool_markdown.append(TOOL_MARKDOWN["rag"])
     system_prompt = BASE_SYSTEM_PROMPT
     blocks = []
-    if skill_markdown:
-        blocks.extend(skill_markdown)
-    if tool_markdown:
-        blocks.extend(tool_markdown)
+    if skill_block:
+        blocks.append(skill_block)
+    if intent in TOOL_MARKDOWN:
+        blocks.append(TOOL_MARKDOWN[intent])
+    elif intent == "rag":
+        blocks.append(TOOL_MARKDOWN["rag"])
     if blocks:
         system_prompt = f"{BASE_SYSTEM_PROMPT}\n\n" + "\n\n".join(blocks)
-    return system_prompt, tool_markdown
+    return system_prompt, blocks
 
 
 def build_callbacks(household_id: str | None) -> list[Any]:
