@@ -6,7 +6,7 @@ This project is a Thai/English multimodal household agent that connects True mob
 
 ## Problem Statement
 
-...
+Nowadays, households often manage many subscriptions across family members. This raises a simple question: how can we track them all in one place, such as TrueMoney Wallet? In the True ecosystem, we also have TrueID, where we can manage and control in-home devices such as IoT equipment.
 
 Example requests:
 
